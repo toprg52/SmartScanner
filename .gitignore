@@ -22,8 +22,7 @@ env/
 .vscode/
 .idea/
 
-# Project-specific: generated outputs (not source code)
-outputs/
+# Project-specific: scratch/temp only
 scratch_edges*/
 boston_cooking_a_output_old.jpg
 
