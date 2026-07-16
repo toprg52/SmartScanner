@@ -14,6 +14,20 @@ The scanner is built on a clean, stateless pure-function pipeline (`src/pipeline
 5. **Curvature Correction:** Detects 3D page curvature. If curved, solves a cubic sheet model using text-span constraints to flatten the page.
 6. **Postprocess:** Contrast enhancement (CLAHE), uneven lighting normalisation (background whitening), and optional adaptive thresholding.
 
+## Project Structure
+
+The codebase is split into modular, single-responsibility files for easy extensibility:
+- **`main.py`**: CLI entry point and argument parsing.
+- **`src/pipeline.py`**: The pure-function orchestrator that chains the modules together.
+- **`src/config.py`**: Centralised configuration file containing all tunable magic numbers and thresholds.
+- **`src/preprocess.py`**: Initial bilateral filtering and blurring.
+- **`src/edges.py`**: Edge mapping via multi-scale Canny and Sobel derivatives.
+- **`src/contours.py`**: Document boundary detection, multi-epsilon simplification, and quad scoring.
+- **`src/transform.py`**: Perspective warping and Hough-line corner snapping.
+- **`src/curvature.py`**: 3D curvature analysis and cubic sheet dewarping.
+- **`src/postprocess.py`**: Final output enhancement (CLAHE, background whitening).
+- **`src/utils.py`**: Shared logging, debug drawing, and file saving helpers.
+
 ## Installation
 
 ```bash
@@ -37,6 +51,12 @@ python main.py --input photo.jpg --postprocess adaptive
 # Skip curvature correction (perspective crop only)
 python main.py --input photo.jpg --no-curvature
 ```
+
+## Tuning & Configuration
+All internal parameters are exposed in `src/config.py`. If the scanner is failing on a specific type of document, you can adjust:
+- **`FLAT_CURVATURE_THRESH`**: Controls how curved a page must be before the cubic solver kicks in (default `0.010`).
+- **`DOC_MIN_AREA_RATIO`**: Minimum percentage of the image the document must cover (default `0.05`).
+- **Edge Params**: `CANNY_LO`, `CANNY_HI`, and `SOBEL_THRESH` can be lowered for very low-contrast pages.
 
 ## Outputs
 - **`outputs/`**: Final processed images.
