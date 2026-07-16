@@ -79,11 +79,8 @@ def main():
             do_whiten=not args.no_whiten,
             do_sharpen=args.sharpen
         )
-        
-        out_path = os.path.join(args.output, f"{stem}_output.jpg")
-        os.makedirs(args.output, exist_ok=True)
-        cv2.imwrite(out_path, final_img)
-        print(f"[main] Saved -> {out_path}")
+        # The pipeline handles saving the comparison image internally
+        # if SAVE_COMPARISONS is enabled in config.
         success += 1
 
     print(f"\n[main] Done. {success}/{len(images)} image(s) processed successfully.")

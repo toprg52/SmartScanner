@@ -2,8 +2,6 @@
 config.py — Centralized configuration parameters.
 """
 
-import numpy as np
-
 # ---------------------------------------------------------------------------
 # DEBUG FLAGS
 # ---------------------------------------------------------------------------
@@ -15,7 +13,6 @@ USE_CURVATURE = True
 # ---------------------------------------------------------------------------
 # PREPROCESS PARAMS
 # ---------------------------------------------------------------------------
-MEDIAN_BLUR_KSIZE = 7  # Keep at 7 — aggressive enough for grain, safe enough for doc edges
 BILATERAL_D = 9
 BILATERAL_SIGMA_COLOR = 75
 BILATERAL_SIGMA_SPACE = 75
@@ -23,33 +20,28 @@ BILATERAL_SIGMA_SPACE = 75
 # ---------------------------------------------------------------------------
 # EDGE PARAMS
 # ---------------------------------------------------------------------------
-# Canny thresholds are now dynamic via Otsu. CANNY_LO/HI are removed.
+CANNY_LO = 15
+CANNY_HI = 60
 CANNY_SCALES = [0.5, 1.0, 1.5]
 SOBEL_THRESH = 35
 CLOSE_KSIZE = 9
-OPEN_KSIZE = 3   # Morph opening before closing to prune thin noise (spiral rings, grain)
 PAD_SIZE = 30
 
 # ---------------------------------------------------------------------------
 # CONTOUR PARAMS
 # ---------------------------------------------------------------------------
-DOC_MIN_AREA_RATIO = 0.10      # Reduced to allow smaller pages/notebooks
+DOC_MIN_AREA_RATIO = 0.05
+DOC_PREFER_AREA_RATIO = 0.25
+DOC_MIN_RECT_SCORE = 0.25
 DOC_TARGET_ASPECT = 1.41
 DOC_ASPECT_TOLERANCE = 0.80
-
-# Scoring / validation parameters
-DOC_MIN_SCORE = 0.55           # Confidence threshold — only warp when detection is reliable
-DOC_CENTER_WEIGHT = 0.15       # Weight for contour centrality (soft heuristic)
-DOC_BORDER_MARGIN = 0.03       # Margin (%) to consider touching border
-DOC_BORDER_PENALTY_PER_SIDE = 0.12  # Score deduction per border-touching side (max ~4 sides)
-DOC_CONVEXITY_WEIGHT = 0.10    # Soft scoring bonus for convex quads (not a hard filter)
-
 APPROX_EPSILONS = [0.01, 0.02, 0.03, 0.04, 0.05, 0.07, 0.09, 0.12]
 
 # ---------------------------------------------------------------------------
 # TRANSFORM PARAMS
 # ---------------------------------------------------------------------------
 HOUGH_RHO = 1
+import numpy as np
 HOUGH_THETA = np.pi / 180
 HOUGH_THRESHOLD = 50
 HOUGH_MIN_LEN = 40

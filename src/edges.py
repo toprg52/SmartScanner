@@ -16,10 +16,7 @@ def _canny_at_scale(gray: np.ndarray, scale: float) -> np.ndarray:
         g  = cv2.resize(gray, (nw, nh), interpolation=cv2.INTER_LINEAR)
     else:
         g = gray
-    # Compute Otsu's threshold on the unscaled image to find a good baseline
-    high_thresh, _ = cv2.threshold(g, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    low_thresh = 0.5 * high_thresh
-    edges = cv2.Canny(g, low_thresh, high_thresh, apertureSize=3)
+    edges = cv2.Canny(g, config.CANNY_LO, config.CANNY_HI, apertureSize=3)
     if scale != 1.0:
         edges = cv2.resize(edges, (w, h), interpolation=cv2.INTER_LINEAR)
         _, edges = cv2.threshold(edges, 50, 255, cv2.THRESH_BINARY)
@@ -59,14 +56,9 @@ def detect_edges(blurred: np.ndarray) -> tuple:
     # Combine all edge sources
     combined = cv2.bitwise_or(edge_ms, cv2.bitwise_or(sx_bin, sy_bin))
 
-    # Morphological opening: remove thin isolated noise (wire rings, grain streaks)
-    # before closing so the closing step only bridges real structural gaps
-    open_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (config.OPEN_KSIZE, config.OPEN_KSIZE))
-    opened = cv2.morphologyEx(combined, cv2.MORPH_OPEN, open_kernel, iterations=1)
-
     # Morphological closing to connect broken document borders
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (config.CLOSE_KSIZE, config.CLOSE_KSIZE))
-    closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel, iterations=2)
+    closed = cv2.morphologyEx(combined, cv2.MORPH_CLOSE, kernel, iterations=2)
 
     # Pad to prevent contour clipping at image boundary
     padded = cv2.copyMakeBorder(
